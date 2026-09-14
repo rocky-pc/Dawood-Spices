@@ -1,4 +1,4 @@
-import { Star, Plus, Flame } from 'lucide-react';
+import { Star, Plus, Minus, Flame } from 'lucide-react';
 import type { ProductWithPricing } from '@/types';
 import { useStore } from '@/context/StoreContext';
 
@@ -8,7 +8,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onQuickView }: ProductCardProps) {
-  const { addToCart } = useStore();
+  const { addToCart, getCartQuantity, updateQuantity } = useStore();
+  const cartQty = getCartQuantity(product.id);
 
   const price = product.branch_price ?? product.base_price;
   const hasDiscount =
@@ -79,7 +80,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         {/* Unit */}
         <p className="text-xs text-gray-500 mb-2">{product.unit}</p>
 
-        {/* Price + Add */}
+        {/* Price + Add/Stepper */}
         <div className="mt-auto flex items-center justify-between gap-2">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
@@ -93,14 +94,39 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
               )}
             </div>
           </div>
-          <button
-            onClick={() => addToCart(product)}
-            disabled={!product.is_available_at_branch}
-            className="p-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
-            aria-label="Add to cart"
-          >
-            <Plus size={18} />
-          </button>
+
+          {cartQty > 0 ? (
+            <div className="flex items-center gap-1.5 bg-amber-50 rounded-lg p-0.5 border border-amber-200">
+              <button
+                onClick={() => updateQuantity(product.id, cartQty - 1)}
+                disabled={!product.is_available_at_branch}
+                className="w-8 h-8 flex items-center justify-center rounded-md bg-white text-amber-700 hover:bg-amber-100 transition-colors shadow-sm disabled:opacity-40"
+                aria-label="Decrease quantity"
+              >
+                <Minus size={16} />
+              </button>
+              <span className="min-w-[28px] text-center text-sm font-bold text-amber-900 tabular-nums">
+                {cartQty}
+              </span>
+              <button
+                onClick={() => addToCart(product, 1)}
+                disabled={!product.is_available_at_branch}
+                className="w-8 h-8 flex items-center justify-center rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors shadow-sm disabled:opacity-40"
+                aria-label="Increase quantity"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => addToCart(product)}
+              disabled={!product.is_available_at_branch}
+              className="p-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              aria-label="Add to cart"
+            >
+              <Plus size={18} />
+            </button>
+          )}
         </div>
 
         {!product.is_available_at_branch && (

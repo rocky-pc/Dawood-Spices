@@ -15,6 +15,7 @@ interface StoreContextValue {
   setSelectedBranch: (branch: Branch) => void;
   cart: CartItem[];
   addToCart: (product: ProductWithPricing, quantity?: number) => void;
+  getCartQuantity: (productId: string) => number;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -98,9 +99,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
         return [...prev, { product, quantity }];
       });
-      setIsCartOpen(true);
     },
     []
+  );
+
+  const getCartQuantity = useCallback(
+    (productId: string) => {
+      const item = cart.find((i) => i.product.id === productId);
+      return item ? item.quantity : 0;
+    },
+    [cart]
   );
 
   const removeFromCart = useCallback((productId: string) => {
@@ -136,6 +144,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setSelectedBranch,
         cart,
         addToCart,
+        getCartQuantity,
         removeFromCart,
         updateQuantity,
         clearCart,
