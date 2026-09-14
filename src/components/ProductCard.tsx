@@ -96,7 +96,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           </div>
 
           {cartQty > 0 ? (
-            <div className="flex items-center gap-1.5 bg-amber-50 rounded-lg p-0.5 border border-amber-200">
+            <div className="flex items-center gap-1.5 bg-amber-50 rounded-lg p-0.5 border border-amber-200 shrink-0 whitespace-nowrap">
               <button
                 onClick={() => updateQuantity(product.id, cartQty - 1)}
                 disabled={!product.is_available_at_branch}
